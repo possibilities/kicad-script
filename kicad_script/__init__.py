@@ -45,3 +45,8 @@ def get_nets(board):
         for item in board
         if item[0] == Symbol("net")
     ]
+
+
+def add_net(board, name):
+    next_id = len(get_nets(board))
+    return (*board, (Symbol("net"), next_id, name))

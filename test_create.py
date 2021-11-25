@@ -24,3 +24,14 @@ def test_get_nets():
     [initial_net] = k.get_nets(board)
     assert initial_net.id == 0
     assert initial_net.name == ""
+
+
+def test_add_nets():
+    board = k.create_board()
+    board = k.add_net(board, "Net 1")
+    board = k.add_net(board, "Net 2")
+    [initial_net, added_net_1, added_net_2] = k.get_nets(board)
+    assert added_net_1.id == 1
+    assert added_net_1.name == "Net 1"
+    assert added_net_2.id == 2
+    assert added_net_2.name == "Net 2"
