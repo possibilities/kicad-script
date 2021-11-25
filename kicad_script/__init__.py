@@ -1,5 +1,6 @@
 from pprint import pprint
 from sexpdata import loads, Symbol
+from types import SimpleNamespace
 
 
 def create_board():
@@ -36,3 +37,11 @@ def set_thickness(board, thickness):
         board,
     )
     return board
+
+
+def get_nets(board):
+    return [
+        SimpleNamespace(**{"id": item[1], "name": item[2]})
+        for item in board
+        if item[0] == Symbol("net")
+    ]

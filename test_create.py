@@ -17,3 +17,10 @@ def test_set_thickness():
     board = k.create_board()
     board = k.set_thickness(board, 1.7)
     assert k.get_thickness(board) == 1.7
+
+
+def test_get_nets():
+    board = k.create_board()
+    [initial_net] = k.get_nets(board)
+    assert initial_net.id == 0
+    assert initial_net.name == ""
