@@ -26,7 +26,7 @@ def test_integrate():
 
     try:
         os.mkdir("data")
-    except:
+    except Exception:
         pass
 
     copyfile("fixtures/initial.kicad_pro", "data/test_add_footprint.kicad_pro")

@@ -57,6 +57,6 @@ def test_add_footprint():
 
     assert k.get_value(footprint, Symbol("layer")) == ["F.Cu"]
     assert k.get_value(footprint, Symbol("attr")) == [Symbol("through_hole")]
-    assert k.get_value(footprint, Symbol("tedit")) != None
-    assert k.get_value(footprint, Symbol("tstamp")) != None
+    assert k.get_value(footprint, Symbol("tedit")) is not None
+    assert k.get_value(footprint, Symbol("tstamp")) is not None
     assert k.get_value(footprint, Symbol("at")) == [50, 60, 0]

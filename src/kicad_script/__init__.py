@@ -4,16 +4,16 @@ from types import SimpleNamespace
 
 
 def create_board():
-    with open("/home/mike/code/kicad_script/fixtures/initial.kicad_pcb") as f:
+    with open("./fixtures/initial.kicad_pcb") as f:
         initial = loads(f.read())
     return initial
 
 
 def get_value(board, name):
     try:
-        value = next(x for x in board if x[0] == Symbol(name))
+        value = next(item for item in board if item[0] == Symbol(name))
         return value[1:]
-    except:
+    except Exception:
         return None
 
 
@@ -27,11 +27,13 @@ def set_value(board, name, value):
     return list(map(item_value, board))
 
 
-timestampable_footprint_items = ["fp_text", "pad"]
+timestampable_footprint_items = ["fp_text", "pad", "gr_line", "fp_line"]
 
 
 def add_timestamps(item):
-    if isinstance(item, list) and str(item[0]) in timestampable_footprint_items:
+    if (isinstance(item, list) or isinstance(item, tuple)) and str(
+        item[0]
+    ) in timestampable_footprint_items:
         item = set_value(item, "tstamp", Symbol(uuid.uuid4()))
     return item
 
@@ -64,7 +66,9 @@ def get_footprints(board):
 
 def get_thickness(board):
     general = next(item for item in board if item[0] == Symbol("general"))
-    thickness = next(item for item in general if item[0] == Symbol("thickness"))
+    thickness = next(
+        item for item in general if item[0] == Symbol("thickness")
+    )
     return thickness[1]
 
 
