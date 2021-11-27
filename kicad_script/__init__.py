@@ -1,5 +1,4 @@
 import uuid
-from pprint import pprint
 from sexpdata import loads, Symbol
 from types import SimpleNamespace
 
@@ -10,34 +9,64 @@ def create_board():
     return initial
 
 
+def get_value(board, name):
+    try:
+        value = next(x for x in board if x[0] == Symbol(name))
+        return value[1:]
+    except:
+        return None
+
+
+def set_value(board, name, value):
+    def item_value(item):
+        if str(item[0]) == name:
+            return (item[0], value)
+        else:
+            return item
+
+    return map(item_value, board)
+
+
+timestampable_footprint_items = ["fp_text", "pad"]
+
+
+def add_timestamps(item):
+    if str(item[0]) in timestampable_footprint_items:
+        item = set_value(item, "tstamp", Symbol(uuid.uuid4()))
+    return item
+
+
+def add_footprint(board, options):
+    id = options["id"]
+    position = options["position"]
+    rotation = options["rotation"]
+    library_name = options["library_name"]
+    footprint_name = options["footprint_name"]
+
+    with open(f"{library_name}.pretty/{footprint_name}.kicad_mod") as f:
+        footprint_template = loads(f.read())
+
+    at = [*position, rotation] if "rotation" in options else position
+
+    footprint = (
+        Symbol("footprint"),
+        f"{library_name}:{footprint_name}",
+        [Symbol("tstamp"), Symbol(uuid.uuid4())],
+        [Symbol("at"), *at],
+        *map(add_timestamps, footprint_template[4:]),
+    )
+
+    return (*board, footprint)
+
+
+def get_footprints(board):
+    return [item for item in board if item[0] == Symbol("footprint")]
+
+
 def get_thickness(board):
     general = next(item for item in board if item[0] == Symbol("general"))
     thickness = next(item for item in general if item[0] == Symbol("thickness"))
     return thickness[1]
-
-
-def set_thickness(board, thickness):
-    def _set_thickness(item):
-        return [Symbol("thickness"), thickness]
-
-    def _set_general(settings):
-        return [
-            Symbol("general"),
-            *map(
-                lambda item: _set_thickness(item)
-                if item[0] == Symbol("thickness")
-                else item,
-                settings[1:],
-            ),
-        ]
-
-    board = map(
-        lambda item: _set_general(item)
-        if item[0] == Symbol("general")
-        else item,
-        board,
-    )
-    return board
 
 
 def get_nets(board):
