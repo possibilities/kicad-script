@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 
 def create_board():
-    with open("./fixtures/initial.kicad_pcb") as f:
+    with open("/home/mike/code/kicad_script/fixtures/initial.kicad_pcb") as f:
         initial = loads(f.read())
     return initial
 
@@ -19,25 +19,24 @@ def get_value(board, name):
 
 def set_value(board, name, value):
     def item_value(item):
-        if str(item[0]) == name:
+        if isinstance(item, list) and str(item[0]) == name:
             return (item[0], value)
         else:
             return item
 
-    return map(item_value, board)
+    return list(map(item_value, board))
 
 
 timestampable_footprint_items = ["fp_text", "pad"]
 
 
 def add_timestamps(item):
-    if str(item[0]) in timestampable_footprint_items:
+    if isinstance(item, list) and str(item[0]) in timestampable_footprint_items:
         item = set_value(item, "tstamp", Symbol(uuid.uuid4()))
     return item
 
 
 def add_footprint(board, options):
-    id = options["id"]
     position = options["position"]
     rotation = options["rotation"]
     library_name = options["library_name"]
@@ -48,13 +47,13 @@ def add_footprint(board, options):
 
     at = [*position, rotation] if "rotation" in options else position
 
-    footprint = (
+    footprint = [
         Symbol("footprint"),
         f"{library_name}:{footprint_name}",
         [Symbol("tstamp"), Symbol(uuid.uuid4())],
         [Symbol("at"), *at],
-        *map(add_timestamps, footprint_template[4:]),
-    )
+        *list(map(add_timestamps, footprint_template[2:])),
+    ]
 
     return (*board, footprint)
 

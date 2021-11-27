@@ -43,7 +43,6 @@ def test_add_footprint():
     board = k.add_footprint(
         board,
         {
-            "id": 1,
             "position": [50, 60],
             "rotation": 0,
             "library_name": "test",
