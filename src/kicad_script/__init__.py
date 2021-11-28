@@ -94,7 +94,22 @@ def add_rotations(footprint_rotation):
     return _add_rotations
 
 
+def add_reference(reference):
+    def _add_reference(item):
+        if (
+            (isinstance(item, list) or isinstance(item, tuple))
+            and len(item) >= 2
+            and item[1] == Symbol("reference")
+            and item[2] == "REF**"
+        ):
+            return [*item[0:2], reference, *item[3:]]
+        return item
+
+    return _add_reference
+
+
 def add_footprint(board, options):
+    reference = options["reference"] if "reference" in options else None
     position = options["position"]
     library_name = options["library_name"]
     footprint_name = options["footprint_name"]
@@ -120,8 +135,14 @@ def add_footprint(board, options):
         map(add_timestamps, footprint_template[2:])
     )
 
+    add_references_with = add_reference(reference)
+
+    footprint_with_references = list(
+        map(add_references_with, footprint_with_timestamps)
+    )
+
     footprint_with_rotations = list(
-        map(add_rotations_at, footprint_with_timestamps)
+        map(add_rotations_at, footprint_with_references)
     )
 
     footprint = [
