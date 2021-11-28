@@ -51,7 +51,11 @@ def add_footprint(board, options):
     with open(f"{library_name}.pretty/{footprint_name}.kicad_mod") as f:
         footprint_template = loads(f.read())
 
-    at = [*position, rotation] if "rotation" in options else position
+    at = (
+        [*position, rotation]
+        if "rotation" in options and options["rotation"] != 0
+        else position
+    )
 
     footprint = [
         Symbol("footprint"),
