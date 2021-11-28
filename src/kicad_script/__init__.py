@@ -21,10 +21,10 @@ def get_value(board, name):
         return None
 
 
-def set_value(board, name, value):
+def set_values(board, name, values):
     def item_value(item):
         if isinstance(item, list) and str(item[0]) == name:
-            return (item[0], value)
+            return (item[0], *values)
         else:
             return item
 
@@ -38,23 +38,69 @@ def add_timestamps(item):
     if (isinstance(item, list) or isinstance(item, tuple)) and str(
         item[0]
     ) in timestampable_footprint_items:
-        item = set_value(item, "tstamp", Symbol(uuid.uuid4()))
+        item = set_values(item, "tstamp", [Symbol(uuid.uuid4())])
     return item
+
+
+rotateable_footprint_items = ["fp_text", "pad"]
+
+
+def add_rotations(footprint_rotation):
+    def _add_rotations(item):
+        if (isinstance(item, list) or isinstance(item, tuple)) and str(
+            item[0]
+        ) in rotateable_footprint_items:
+            item_position = get_value(item, "at")
+            if not item_position:
+                return item
+            item_rotation = (
+                item_position[2]
+                if len(item_position) == 3
+                and isinstance(item_position[2], int)
+                else 0
+            )
+            item = set_values(
+                item,
+                "at",
+                (
+                    item_position[0],
+                    item_position[1],
+                    item_rotation + footprint_rotation,
+                ),
+            )
+        return item
+
+    return _add_rotations
 
 
 def add_footprint(board, options):
     position = options["position"]
-    rotation = options["rotation"]
     library_name = options["library_name"]
     footprint_name = options["footprint_name"]
 
     with open(f"{library_name}.pretty/{footprint_name}.kicad_mod") as f:
         footprint_template = loads(f.read())
 
+    footprint_rotation = (
+        options["rotation"]
+        if "rotation" in options and options["rotation"] != 0
+        else 0
+    )
+
     at = (
-        [*position, rotation]
+        [*position, footprint_rotation]
         if "rotation" in options and options["rotation"] != 0
         else position
+    )
+
+    add_rotations_at = add_rotations(footprint_rotation)
+
+    footprint_with_timestamps = list(
+        map(add_timestamps, footprint_template[2:])
+    )
+
+    footprint_with_rotations = list(
+        map(add_rotations_at, footprint_with_timestamps)
     )
 
     footprint = [
@@ -62,7 +108,7 @@ def add_footprint(board, options):
         f"{library_name}:{footprint_name}",
         [Symbol("tstamp"), Symbol(uuid.uuid4())],
         [Symbol("at"), *at],
-        *list(map(add_timestamps, footprint_template[2:])),
+        *footprint_with_rotations,
     ]
 
     return (*board, footprint)

@@ -44,7 +44,6 @@ def test_add_footprint():
         board,
         {
             "position": [50, 60],
-            "rotation": 0,
             "library_name": "test",
             "footprint_name": "test",
         },
