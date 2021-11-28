@@ -2,7 +2,6 @@ import uuid
 import json
 from os import path, mkdir
 from sexpdata import dumps, loads, Symbol
-from types import SimpleNamespace
 from shutil import copytree
 
 
@@ -14,6 +13,14 @@ def create_board():
 
 
 def get_value(board, name):
+    try:
+        value = next(item for item in board if item[0] == Symbol(name))
+        return value[1]
+    except Exception:
+        return None
+
+
+def get_values(board, name):
     try:
         value = next(item for item in board if item[0] == Symbol(name))
         return value[1:]
@@ -50,7 +57,7 @@ def add_rotations(footprint_rotation):
         if (isinstance(item, list) or isinstance(item, tuple)) and str(
             item[0]
         ) in rotateable_footprint_items:
-            item_position = get_value(item, "at")
+            item_position = get_values(item, "at")
             if not item_position:
                 return item
             item_rotation = (
@@ -118,20 +125,8 @@ def get_footprints(board):
     return [item for item in board if item[0] == Symbol("footprint")]
 
 
-def get_thickness(board):
-    general = next(item for item in board if item[0] == Symbol("general"))
-    thickness = next(
-        item for item in general if item[0] == Symbol("thickness")
-    )
-    return thickness[1]
-
-
 def get_nets(board):
-    return [
-        SimpleNamespace(**{"id": item[1], "name": item[2]})
-        for item in board
-        if item[0] == Symbol("net")
-    ]
+    return [item for item in board if item[0] == Symbol("net")]
 
 
 def add_net(board, name):
