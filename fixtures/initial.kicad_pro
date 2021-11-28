@@ -124,19 +124,11 @@
     "equivalence_files": []
   },
   "libraries": {
-    "pinned_footprint_libs": [
-      "kbd",
-      "Keebio-Parts",
-      "keyboard_parts",
-      "keyswitches",
-      "MX_Only",
-      "pg1232",
-      "pg1350"
-    ],
+    "pinned_footprint_libs": [],
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "footprint_test.kicad_pro",
+    "filename": "initial.kicad_pro",
     "version": 1
   },
   "net_settings": {

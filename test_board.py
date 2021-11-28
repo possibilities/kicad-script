@@ -60,3 +60,23 @@ def test_add_footprint():
     assert k.get_value(footprint, Symbol("tedit")) is not None
     assert k.get_value(footprint, Symbol("tstamp")) is not None
     assert k.get_value(footprint, Symbol("at")) == [50, 60, 0]
+
+
+def test_save_board():
+    board = k.create_board()
+    board = k.set_edge_cut_points(
+        board, ((71.12, 40.64), (71.12, 78.74), (30.48, 78.74), (30.48, 40.64))
+    )
+    board = k.add_net(board, "Net 1")
+    board = k.add_net(board, "Net 2")
+    board = k.add_footprint(
+        board,
+        {
+            "id": 1,
+            "position": [50, 60],
+            "rotation": 15,
+            "library_name": "test",
+            "footprint_name": "test",
+        },
+    )
+    k.save_board(board, "data", "test")

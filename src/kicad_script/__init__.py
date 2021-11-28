@@ -1,10 +1,14 @@
 import uuid
-from sexpdata import loads, Symbol
+import json
+from os import path, mkdir
+from sexpdata import dumps, loads, Symbol
 from types import SimpleNamespace
+from shutil import copytree
 
 
 def create_board():
-    with open("./fixtures/initial.kicad_pcb") as f:
+    basepath = path.dirname(__file__)
+    with open(f"{basepath}/../../fixtures/initial.kicad_pcb") as f:
         initial = loads(f.read())
     return initial
 
@@ -112,3 +116,42 @@ def get_edge_cut_points(board):
         for item in board
         if item[0] == Symbol("gr_line") and item[3][1] == "Edge.Cuts"
     ]
+
+
+def save_board(board, project_path, project_name):
+    try:
+        mkdir(project_path)
+    except FileExistsError:
+        pass
+
+    footprints = get_footprints(board)
+    footprint_library_names = []
+
+    for footprint in footprints:
+        [library_name, footprint_name] = footprint[1].split(":")
+        if library_name not in footprint_library_names:
+            footprint_library_names.append(library_name)
+
+    for library_name in footprint_library_names:
+        try:
+            copytree(f"{library_name}.pretty", f"data/{library_name}.pretty")
+        except FileExistsError:
+            pass
+
+    pcb_file = open(f"{project_path}/{project_name}.kicad_pcb", "w")
+    pcb_file.write(dumps(board, pretty_print=True).replace("\\.", "."))
+    pcb_file.close()
+    basepath = path.dirname(__file__)
+    with open(f"{basepath}/../../fixtures/initial.kicad_pro") as pro_file:
+        initial_kicad_pro_file = pro_file.read()
+
+    initial_kicad_pro_file = json.loads(initial_kicad_pro_file)
+
+    initial_kicad_pro_file = {
+        **initial_kicad_pro_file,
+        "meta": {"filename": f"{project_name}.kicad_pro"},
+    }
+
+    pro_file = open(f"{project_path}/{project_name}.kicad_pro", "w")
+    pro_file.write(json.dumps(initial_kicad_pro_file))
+    pro_file.close()
