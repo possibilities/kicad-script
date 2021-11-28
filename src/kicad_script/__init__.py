@@ -2,7 +2,7 @@ import uuid
 import json
 from os import path, mkdir
 from sexpdata import dumps, loads, Symbol
-from shutil import copytree
+from shutil import copytree, rmtree
 
 
 def create_board():
@@ -58,21 +58,35 @@ def add_rotations(footprint_rotation):
             item[0]
         ) in rotateable_footprint_items:
             item_position = get_values(item, "at")
+
             if not item_position:
                 return item
+
+            item_position_numbers = [
+                value for value in item_position if type(value) in [int, float]
+            ]
+
+            item_position_non_numbers = [
+                value
+                for value in item_position
+                if type(value) not in [int, float]
+            ]
+
             item_rotation = (
-                item_position[2]
-                if len(item_position) == 3
-                and isinstance(item_position[2], int)
+                item_position_numbers[2]
+                if len(item_position_numbers) == 3
+                and isinstance(item_position_numbers[2], int)
                 else 0
             )
+
             item = set_values(
                 item,
                 "at",
                 (
-                    item_position[0],
-                    item_position[1],
+                    item_position_numbers[0],
+                    item_position_numbers[1],
                     item_rotation + footprint_rotation,
+                    *item_position_non_numbers,
                 ),
             )
         return item
@@ -178,14 +192,13 @@ def save_board(board, project_path, project_name):
             footprint_library_names.append(library_name)
 
     for library_name in footprint_library_names:
-        try:
-            copytree(f"{library_name}.pretty", f"data/{library_name}.pretty")
-        except FileExistsError:
-            pass
+        rmtree(f"data/{library_name}.pretty")
+        copytree(f"{library_name}.pretty", f"data/{library_name}.pretty")
 
     pcb_file = open(f"{project_path}/{project_name}.kicad_pcb", "w")
     pcb_file.write(dumps(board, pretty_print=True).replace("\\.", "."))
     pcb_file.close()
+
     basepath = path.dirname(__file__)
     with open(f"{basepath}/../../fixtures/initial.kicad_pro") as pro_file:
         initial_kicad_pro_file = pro_file.read()
