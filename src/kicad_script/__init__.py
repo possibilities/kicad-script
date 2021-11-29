@@ -12,6 +12,12 @@ def create_board():
     return initial
 
 
+def load_board(project_path, project_name):
+    with open(f"{project_path}/{project_name}.kicad_pcb") as f:
+        board = loads(f.read())
+    return board
+
+
 def get_value(board, name):
     try:
         value = next(item for item in board if item[0] == Symbol(name))
@@ -22,9 +28,14 @@ def get_value(board, name):
 
 def get_values(board, name):
     try:
-        value = next(item for item in board if item[0] == Symbol(name))
+        value = next(
+            item
+            for item in board
+            if isinstance(item, list) and item[0] == Symbol(name)
+        )
         return value[1:]
-    except Exception:
+    except Exception as err:
+        print(err)
         return None
 
 
@@ -156,16 +167,12 @@ def add_footprint(board, options):
     return (*board, footprint)
 
 
-def get_footprints(board):
-    return [item for item in board if item[0] == Symbol("footprint")]
-
-
-def get_nets(board):
-    return [item for item in board if item[0] == Symbol("net")]
+def get_collection(board, name):
+    return [item for item in board if item[0] == Symbol(name)]
 
 
 def add_net(board, name):
-    next_id = len(get_nets(board))
+    next_id = len(get_collection(board, "net"))
     return (*board, (Symbol("net"), next_id, name))
 
 
@@ -204,7 +211,7 @@ def save_board(board, project_path, project_name):
     except FileExistsError:
         pass
 
-    footprints = get_footprints(board)
+    footprints = get_collection(board, "footprint")
     footprint_library_names = []
 
     for footprint in footprints:
@@ -213,7 +220,11 @@ def save_board(board, project_path, project_name):
             footprint_library_names.append(library_name)
 
     for library_name in footprint_library_names:
-        rmtree(f"data/{library_name}.pretty")
+        try:
+            rmtree(f"data/{library_name}.pretty")
+        except Exception:
+            pass
+
         copytree(f"{library_name}.pretty", f"data/{library_name}.pretty")
 
     pcb_file = open(f"{project_path}/{project_name}.kicad_pcb", "w")

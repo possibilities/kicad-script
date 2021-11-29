@@ -12,7 +12,7 @@ def test_add_and_get_nets():
     board = k.add_net(board, "Net 1")
     board = k.add_net(board, "Net 2")
 
-    [initial_net, added_net_1, added_net_2] = k.get_nets(board)
+    [initial_net, added_net_1, added_net_2] = k.get_collection(board, "net")
 
     assert added_net_1[1] == 1
     assert added_net_1[2] == "Net 1"
@@ -38,7 +38,7 @@ def test_add_footprint():
         },
     )
 
-    [footprint] = k.get_footprints(board)
+    [footprint] = k.get_collection(board, "footprint")
 
     assert footprint[0] == Symbol("footprint")
     assert footprint[1] == "test:test"
