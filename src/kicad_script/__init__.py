@@ -31,7 +31,8 @@ def get_values(board, name):
         value = next(
             item
             for item in board
-            if isinstance(item, list) and item[0] == Symbol(name)
+            if (isinstance(item, list) or isinstance(item, tuple))
+            and item[0] == Symbol(name)
         )
         return value[1:]
     except Exception as err:
@@ -164,7 +165,7 @@ def add_footprint(board, options):
         *footprint_with_rotations,
     ]
 
-    return (*board, footprint)
+    return [*board, footprint]
 
 
 def get_collection(board, name):
