@@ -120,7 +120,7 @@ def add_reference(reference):
     return _add_reference
 
 
-def add_footprint(board, options):
+def create_footprint(options):
     reference = options["reference"] if "reference" in options else None
     position = options["position"]
     library_name = options["library_name"]
@@ -165,6 +165,10 @@ def add_footprint(board, options):
         *footprint_with_rotations,
     ]
 
+    return footprint
+
+
+def add_footprint(board, footprint):
     return [*board, footprint]
 
 

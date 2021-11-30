@@ -30,12 +30,14 @@ def test_add_footprint():
     board = k.create_board()
     board = k.add_footprint(
         board,
-        {
-            "reference": "TEST_1",
-            "position": [50, 60],
-            "library_name": "test",
-            "footprint_name": "test",
-        },
+        k.create_footprint(
+            {
+                "reference": "TEST_1",
+                "position": [50, 60],
+                "library_name": "test",
+                "footprint_name": "test",
+            },
+        ),
     )
 
     [footprint] = k.get_collection(board, "footprint")
@@ -59,12 +61,14 @@ def test_save_board():
     board = k.add_net(board, "Net 2")
     board = k.add_footprint(
         board,
-        {
-            "reference": "TEST_1",
-            "position": [50, 60],
-            "rotation": 15,
-            "library_name": "test",
-            "footprint_name": "test",
-        },
+        k.create_footprint(
+            {
+                "reference": "TEST_1",
+                "position": [50, 60],
+                "rotation": 15,
+                "library_name": "test",
+                "footprint_name": "test",
+            },
+        ),
     )
     k.save_board(board, "data", "test")
