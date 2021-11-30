@@ -9,8 +9,8 @@ def test_create_board():
 
 def test_add_and_get_nets():
     board = k.create_board()
-    board = k.add_net(board, "Net 1")
-    board = k.add_net(board, "Net 2")
+    board = k.add_net(board, k.create_net(1, "Net 1"))
+    board = k.add_net(board, k.create_net(2, "Net 2"))
 
     [initial_net, added_net_1, added_net_2] = k.get_collection(board, "net")
 
@@ -57,8 +57,8 @@ def test_save_board():
     board = k.set_edge_cut_points(
         board, ((71.12, 40.64), (71.12, 78.74), (30.48, 78.74), (30.48, 40.64))
     )
-    board = k.add_net(board, "Net 1")
-    board = k.add_net(board, "Net 2")
+    board = k.add_net(board, k.create_net(1, "Net 1"))
+    board = k.add_net(board, k.create_net(2, "Net 2"))
     board = k.add_footprint(
         board,
         k.create_footprint(

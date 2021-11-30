@@ -176,9 +176,12 @@ def get_collection(board, name):
     return [item for item in board if item[0] == Symbol(name)]
 
 
-def add_net(board, name):
-    next_id = len(get_collection(board, "net"))
-    return (*board, (Symbol("net"), next_id, name))
+def add_net(board, net):
+    return [*board, net]
+
+
+def create_net(id, name):
+    return [Symbol("net"), id, name]
 
 
 def set_edge_cut_points(board, points, width=0.1):
