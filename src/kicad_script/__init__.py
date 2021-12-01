@@ -184,25 +184,34 @@ def create_net(id, name):
     return [Symbol("net"), id, name]
 
 
-def set_edge_cut_points(board, points, width=0.1):
+def set_edge_cut_points(board, lines, width=0.1):
     return (
         *board,
         *[
             (
                 Symbol("gr_line"),
-                (Symbol("start"), point[0], point[1]),
-                (
-                    Symbol("end"),
-                    points[index + 1 if index < (len(points) - 1) else 0][0],
-                    points[index + 1 if index < (len(points) - 1) else 0][1],
-                ),
+                (Symbol("start"), *line["start"]),
+                (Symbol("end"), *line["end"]),
                 (Symbol("layer"), "Edge.Cuts"),
                 (Symbol("width"), width),
                 (Symbol("tstamp"), Symbol(uuid.uuid4())),
             )
-            for index, point in enumerate(points)
+            for line in lines
         ],
     )
+
+
+def polyline_to_lines(points):
+    return [
+        {
+            "start": point,
+            "end": (
+                points[index + 1 if index < (len(points) - 1) else 0][0],
+                points[index + 1 if index < (len(points) - 1) else 0][1],
+            ),
+        }
+        for index, point in enumerate(points)
+    ]
 
 
 def get_edge_cut_points(board):

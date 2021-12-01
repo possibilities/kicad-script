@@ -22,7 +22,9 @@ def test_add_and_get_nets():
 
 def test_set_and_get_edge_cut_points():
     board = k.create_board()
-    board = k.set_edge_cut_points(board, ((-5, -5), (5, -5), (5, 5), (-5, 5)))
+    board = k.set_edge_cut_points(
+        board, k.polyline_to_lines([(-5, -5), (5, -5), (5, 5), (-5, 5)])
+    )
     assert k.get_edge_cut_points(board) == [(-5, -5), (5, -5), (5, 5), (-5, 5)]
 
 
@@ -55,7 +57,10 @@ def test_add_footprint():
 def test_save_board():
     board = k.create_board()
     board = k.set_edge_cut_points(
-        board, ((71.12, 40.64), (71.12, 78.74), (30.48, 78.74), (30.48, 40.64))
+        board,
+        k.polyline_to_lines(
+            [(71.12, 40.64), (71.12, 78.74), (30.48, 78.74), (30.48, 40.64)]
+        ),
     )
     board = k.add_net(board, k.create_net(1, "Net 1"))
     board = k.add_net(board, k.create_net(2, "Net 2"))
